@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialFilterState = {severityType: 'All', hackType: 'All'}
+const initialFilterState = {severityType: 'All', hackType: 'All', searchTerm: '', submittedTerm: ''}
 
 const filterSlice = createSlice({
     name: 'filter',
@@ -12,6 +12,14 @@ const filterSlice = createSlice({
 
         setHackType(state, action) {
             state.hackType = action.payload // The payload will be different hack types
+        },
+
+        setSearchTerm(state, action) {
+            state.searchTerm = action.payload
+        },
+
+        setSubmittedTerm (state, action) {
+            state.submittedTerm = action.payload
         }
 
     }
