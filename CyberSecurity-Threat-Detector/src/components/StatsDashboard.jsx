@@ -15,11 +15,11 @@ export default function StatsDashboard() {
 
     const error = useSelector(state => state.threats.error)
 
-    //stores all severity types into this variable
-    const selectedSeverity = useSelector(state => state.filter.severityType) //initially would be the 'all' option
-    
-    //stores all hack types into this variable
-    const selectedHackType = useSelector(state => state.filter.hackType)
+    //stores all vendor types into this variable
+    const selectedVendor = useSelector(state => state.filter.selectedVendor) //initially would be the 'all' option
+
+    //stores all ransomware types into this variable
+    const selectedRansomware = useSelector(state => state.filter.selectedRansomware)
 
     const submittedTerm = useSelector(state => state.filter.submittedTerm)
     
@@ -55,49 +55,71 @@ export default function StatsDashboard() {
     }, [])
 
     const filteredThreats = threats.filter((threat) => {
-        // //if the hack type dropdown is set to all but the severity dropdown is a specific option chosen by the user
-        // //made it lowercase since it is case sensitive
-        // const severitySpecific = selectedHackType === 'All' && threat.severity.toLowerCase() === selectedSeverity.toLowerCase()
-
-        // //if the severity type dropdown is set to all but the hack type dropdown is a specific option chosen by the user
-        // const hackTypeSpecific = selectedSeverity === 'All' && threat.type === selectedHackType
-
-        // //if both dropdowns are set to all, return everything
-        // const bothFiltersAll = selectedSeverity === 'All' && selectedHackType === 'All'
-
-        // //if both dropdowns are specified by the user. Show the result of the filter
-        // const bothFiltersSpecific = selectedSeverity !== 'All' && selectedHackType !== 'All' 
-        //                             && threat.severity === selectedSeverity.toLowerCase() 
-        //                             && threat.type === selectedHackType
-
-        // If no search term entered (submittedTerm is empty) -> don't filter by search, show everything that matches dropdowns
-        // If search term entered -> only show threats where the search term is found in sstatus OR type
+       
+        // If no search term entered (submittedTerm is empty) -> show all information
+        // If search term entered -> only show information if the search term matches any of the parameters set  
 
         const bySearch = submittedTerm === '' || 
-                         threat.cveID.toLowerCase().includes(submittedTerm.toLowerCase()) ||  
-                         threat.vendorProject.toLowerCase().includes(submittedTerm.toLowerCase())
+                         threat.cveID?.toLowerCase().includes(submittedTerm.toLowerCase()) ||  
+                         threat.vendorProject?.toLowerCase().includes(submittedTerm.toLowerCase()) ||
+                         threat.product?.toLowerCase().includes(submittedTerm.toLowerCase()) ||
+                         threat.vulnerabilityName?.toLowerCase().includes(submittedTerm.toLowerCase())
 
-        // Show threats that match BOTH the search criteria AND the dropdown filter criteria
-        // Examples:
-        // - No search + "Critical" severity -> all critical threats
-        // - "ransomware" search + "All" severity -> all ransomware threats  
-        // - "ransomware" search + "Critical" severity -> only critical ransomware threats
-        // return bySearch && (severitySpecific || hackTypeSpecific || bothFiltersAll || bothFiltersSpecific)
+        //For the vendor dropdown
+        //if one of the statements is true it passes
+        //If the user selects 'All' it will show all vendors
+        //If the user selected a specific vendor, only show threats from that vendor
+        const byVendor = selectedVendor === 'All' || threat.vendorProject?.toLowerCase() === selectedVendor.toLowerCase();
 
-        return bySearch;
+        const byRansomware = selectedRansomware === 'All' || threat.knownRansomwareCampaignUse?.toLowerCase() === selectedRansomware.toLowerCase();
+
+        // Return true if all conditions are met
+        return bySearch && byVendor && byRansomware;
     })
 
-    // const stats = calculateThreatStats(filteredThreats)
+    const totalVulnerabilities = filteredThreats.length;
 
+    const ransomwareCount = filteredThreats.filter(threat => threat.knownRansomwareCampaignUse === 'Known').length
+
+    //apply this later
+    const unknownRansomwareCount = filteredThreats.filter(threat => threat.knownRansomwareCampaignUse === 'Unknown').length
+
+    //gives today the date object, which stores the current day
+    const today = new Date();
+
+    //done the same here
+    const nextWeek = new Date();
+
+    // Set the date to one week from today
+    //If today is Monday, next week will be the following Monday
+    nextWeek.setDate(today.getDate() + 7);
+
+    const criticalDueDate = filteredThreats.filter(threat => {
+      //sets the dueDate to the same one in our API 
+      //property name dueDate
+      const dueDate = new Date(threat.dueDate);
+
+      //is the duedate between today and next week?
+      //return the length at the end
+      //Ex: if today is Monday, and the dueDate is next Monday, it should be included
+      return dueDate >= today && dueDate <= nextWeek;
+    }).length;
 
   return (
     <div className='stats-dashboard-container'>
-        {/* <label>title: {firstThreatTitle}</label> */}
-        {/* <label>Total threats: {stats.total} </label>
-        <label>Critical: {stats.critical} </label>
-        <label>High risk: {stats.high} </label>
-        <label>Active: {stats.active} </label> */}
-        {/* <label>Investigating: #</label> */}
+        {/* Simple stats display */}
+        <div>
+            <h3>Total Vulnerabilities</h3>
+            <p>{totalVulnerabilities}</p>
+        </div>
+        <div>
+            <h3>Ransomware Related</h3>
+            <p>{ransomwareCount}</p>
+        </div>
+        <div>
+            <h3>Critical Due Dates</h3>
+            <p>{criticalDueDate}</p>
+        </div>
 
         {/*If submittedTerm is true, display the status'  */}
         {/*Will be adjusted to displaying good amounts of information */}

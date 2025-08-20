@@ -42,7 +42,7 @@ export default function Results() {
         value={searchedTerm} 
         onChange={handleInputChange} 
         type="text" 
-        placeholder='Enter a threat type or title' />
+        placeholder='Enter a threat' />
 
         
     </div>

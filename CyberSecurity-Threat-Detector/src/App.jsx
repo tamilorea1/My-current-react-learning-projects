@@ -10,7 +10,7 @@ function App() {
     <>
       <Header/>
       <StatsDashboard/>
-      {/* <FilteredSection/> */}
+      <FilteredSection/>
       <Results/>
     </>
   )

@@ -8,48 +8,63 @@ import { filterActions } from '../store/filter'
 
 export default function FilteredSection() {
 
-    //gets the initial state of the severity type dropdown which is 'All'
-    const selectedSeverity = useSelector(state => state.filter.severityType) 
+    const threats = useSelector(state => state.threats.threats)
+    
 
-    //gets the initial state of the hack type dropdown which is 'All'
-    const selectedHackType = useSelector(state => state.filter.hackType)
+    //gets the initial state of the selected vendor dropdown which is 'All'
+    const selectedVendor = useSelector(state => state.filter.selectedVendor) 
+
+    //gets the initial state of the ransomware dropdown which is 'All'
+    const selectedRansomware = useSelector(state => state.filter.selectedRansomware)
 
     //used to access all actions from the filter.js file
     const dispatch = useDispatch()
 
     //handles the different options changes that a user makes
-    function handleOptionChange(event) {
+    function handleVendorOptionChange(event) {
         event.preventDefault();
 
-        //gets the option selected by the user and stores it in the state 'selectedSeverity'
-        dispatch(filterActions.setSeverityType(event.target.value))
+        //gets the option selected by the user and stores it in the state 'selectedVendor'
+        dispatch(filterActions.setSelectedVendor(event.target.value))
     }
 
-    function handleHackTypeOptions(event) {
+    function handleRansomwareOptions(event) {
         event.preventDefault();
 
-        //gets the option selected by the user and stores it in the state 'selectedHackType'
-        dispatch(filterActions.setHackType(event.target.value))
+        //gets the option selected by the user and stores it in the state 'selectedRansomware'
+        dispatch(filterActions.setSelectedRansomware(event.target.value))
     }
+
+    //gather all the vendorProjects into the variable
+    const allVendorNames = threats.map(threat => threat.vendorProject)
+
+    // Remove any empty or null values
+    const cleanNames = allVendorNames.filter(Boolean)
+
+    // Create a set to remove duplicates
+    //Ex: if oracle appears twice, it will only keep one instance
+    const nonDuplicateVendorNames = new Set(cleanNames);
+
+    // Convert the set back to an array
+    //Have 'All' be the first value, and then spread the unique vendor project names
+    const completeVendorList = ['All', ...nonDuplicateVendorNames] 
 
   return (
     <div>
         {/*Stores all options under a dropdown */}
         
-        <select value={selectedSeverity} onChange={handleOptionChange}>
-            <option value="All">All severities</option>
-            <option value="Critical">Critical</option>
-            <option value="High">High</option>
-            <option value="Medium">Medium</option>
-            <option value="Low">Low</option>
-        </select>
+       <select value={selectedVendor} onChange={handleVendorOptionChange}>
+            {
+                completeVendorList.map(vendor => {
+                    return <option value={vendor} key={vendor}>{vendor}</option>
+                })
+            }
+       </select>
 
-        <select value={selectedHackType} onChange={handleHackTypeOptions}>
-            <option value="All">All Types</option>
-            <option value="Ransomware">Ransomware</option>
-            <option value="Phishing">Phishing</option>
-            <option value="APT">APT</option>
-            <option value="Brute Force">Brute Force</option>
+        <select value={selectedRansomware} onChange={handleRansomwareOptions}>
+            <option value="All">All Ransomware</option>
+            <option value="Known">Ransomware Known</option>
+            <option value="Unknown">Ransomware Unknown</option>
         </select>
     </div>
   )

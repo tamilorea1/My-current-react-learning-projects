@@ -1,25 +1,26 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialFilterState = {severityType: 'All', hackType: 'All', searchTerm: '', submittedTerm: ''}
+const initialFilterState = { searchTerm: '', submittedTerm: '', selectedVendor: 'All', selectedRansomware: 'All'}
 
 const filterSlice = createSlice({
     name: 'filter',
     initialState: initialFilterState,
     reducers: {
-        setSeverityType(state, action) {
-            state.severityType = action.payload //The payload will represent the severity type 'critical', 'high', 'all', etc
-        },
-
-        setHackType(state, action) {
-            state.hackType = action.payload // The payload will be different hack types
-        },
-
+        
         setSearchTerm(state, action) {
             state.searchTerm = action.payload
         },
 
         setSubmittedTerm (state, action) {
             state.submittedTerm = action.payload
+        },
+
+        setSelectedVendor(state, action) {
+            state.selectedVendor = action.payload //The payload will represent the selected vendor
+        },
+
+        setSelectedRansomware(state, action) {
+            state.selectedRansomware = action.payload //The payload will represent the selected ransomware type
         }
 
     }
