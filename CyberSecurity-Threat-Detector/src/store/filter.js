@@ -21,6 +21,13 @@ const filterSlice = createSlice({
 
         setSelectedRansomware(state, action) {
             state.selectedRansomware = action.payload //The payload will represent the selected ransomware type
+        },
+
+        setReset(state) {
+            state.searchTerm = ''
+            state.submittedTerm = ''
+            state.selectedVendor = 'All'
+            state.selectedRansomware = 'All'
         }
 
     }

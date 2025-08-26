@@ -35,6 +35,10 @@ export default function FilteredSection() {
         dispatch(filterActions.setSelectedRansomware(event.target.value))
     }
 
+    function resetButtonPressed() {
+        dispatch(filterActions.setReset())
+    }
+
     //gather all the vendorProjects into the variable
     const allVendorNames = threats.map(threat => threat.vendorProject)
 

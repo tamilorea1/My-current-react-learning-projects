@@ -32,8 +32,7 @@ export default function Results() {
     }
 
     function resetButtonPressed(params) {
-        dispatch(filterActions.setSearchTerm(''))
-        dispatch(filterActions.setSubmittedTerm(''))
+        dispatch(filterActions.setReset())
         setCurrentPage(1)
 
     }
