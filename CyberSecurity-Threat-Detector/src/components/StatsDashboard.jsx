@@ -6,6 +6,10 @@ import { threatActions } from '../store/threats';
 import { functions } from '../firebase';
 import { httpsCallable } from 'firebase/functions';
 import { useFilteredThreats } from '../hooks/useFilteredThreats';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faBullseye, faVirus, faHourglassStart } from "@fortawesome/free-solid-svg-icons";
+import LoadingScreen from './LoadingScreen';
+import Error from './Error';
 
 export default function StatsDashboard() {
 
@@ -18,13 +22,16 @@ export default function StatsDashboard() {
 
     const dispatch = useDispatch();
 
-    useEffect(() => {
-      //data is being loaded
-      dispatch(threatActions.setThreatsAtStart())
-
+    
+    
+      
       // Simulate fetching data from an API
       const fetchData = async () => {
+        //data is being loaded
+        dispatch(threatActions.setThreatsAtStart())
         try {
+            // throw new Error('Testing error handling!')
+
           const response = await fetch('https://getcisathreats-nllkmt6r6a-uc.a.run.app')
 
           if (!response.ok) {
@@ -33,19 +40,39 @@ export default function StatsDashboard() {
 
           const data = await response.json();
 
+          // Add a small delay to show the loading state
+          await new Promise(resolve => setTimeout(resolve, 1000));
+
           //vulnerabilities is stored in an array
           //so we need to spread the array into the action payload
           //also slice the number of vulnerabilities from 0 -10 i think when mapping over the filteredThreats
-          dispatch(threatActions.setThreatsAtSuccess(data.vulnerabilities || []));
+          // dispatch(threatActions.setThreatsAtSuccess(data.vulnerabilities || []));
+
+          // Make sure we have data before dispatching success
+          if (data && Array.isArray(data.vulnerabilities)) {
+            console.log(`Successfully loaded ${data.vulnerabilities.length} vulnerabilities`)
+            dispatch(threatActions.setThreatsAtSuccess(data.vulnerabilities));
+          } else if (data && data.vulnerabilities) {
+            // If vulnerabilities exists but isn't an array, handle it
+            console.log('Vulnerabilities data exists but is not an array:', data.vulnerabilities)
+            dispatch(threatActions.setThreatsAtSuccess([]));
+          } else {
+            // If no vulnerabilities data at all
+            console.log('No vulnerabilities data found in response')
+            dispatch(threatActions.setThreatsAtSuccess([]));
+          }
 
         } catch (error) {
-          dispatch(threatActions.setThreatsAtFailure('Nothing'))
+          dispatch(threatActions.setThreatsAtFailure(`Failed to load threats: ${error.message}`))
         }
       };
 
-      fetchData();
 
-    }, [])
+    
+      useEffect(() => {
+        fetchData()
+      }, [dispatch])
+
 
     
 
@@ -78,25 +105,54 @@ export default function StatsDashboard() {
     }).length;
 
 
+    if (loading) {
+      return <LoadingScreen/>
+    }
+    
+    if (error) {
+      return <Error error={error} onRetry={fetchData}/>
+    }
+
+
   return (
     <div className='stats-dashboard-container'>
         {/* Simple stats display */}
-        <div>
-            <h3>Total Vulnerabilities</h3>
-            <p>{totalVulnerabilities}</p>
-        </div>
-        <div>
-            <h3>Ransomware Related</h3>
-            <p>{ransomwareCount}</p>
-        </div>
-        <div>
-            <h3>Critical Due Dates</h3>
-            <p>{criticalDueDate}</p>
+        <div className='stats-field'>
+            <div className='stats-content'>
+              <h3>Total Vulnerabilities</h3>
+              <p>{totalVulnerabilities}</p>
+            </div>
+            <FontAwesomeIcon 
+            className='stats-icon' 
+            icon={faBullseye} 
+            style={{color: "#2119ffff",}} />
         </div>
 
+        <div className='stats-field'>
+            <div className='stats-content'> 
+               <h3>Ransomware Related</h3>
+                <p className='ransomware-p'>{ransomwareCount}</p>
+            </div>
+           
+            <FontAwesomeIcon 
+            className='stats-icon' 
+            icon={faVirus} 
+            style={{color: "#f00000ff",}} />
 
-        
+        </div>
 
-          </div>
+        <div className='stats-field'>
+            <div className='stats-content'>
+              <h3>Critical Due Dates</h3>
+              <p className='due-date-p'>{criticalDueDate}</p>
+            </div>
+            
+            <FontAwesomeIcon 
+            className='stats-icon' 
+            icon={faHourglassStart} 
+            style={{color: "#5c0c00ff",}} />
+
+        </div>
+      </div>
   )
 }

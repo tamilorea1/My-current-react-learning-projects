@@ -4,6 +4,7 @@ import {useDispatch, useSelector} from 'react-redux'
 
 import { filterActions } from '../store/filter'
 import { useFilteredThreats } from '../hooks/useFilteredThreats'
+import Modal from './Modal'
 
 export default function Results() {
 
@@ -18,6 +19,10 @@ export default function Results() {
     //displays a certain number of rows to show per page
     //the default is 7
     const [itemsPerPage, setItemsPerPage] = useState(7)
+
+    const [isModalOpen, setIsModalOpen] = useState(false)
+
+    const [selectedCVE, setSelectedCVE] = useState(null)
 
     function handleInputChange(event) {
         dispatch(filterActions.setSearchTerm(event.target.value))
@@ -35,6 +40,16 @@ export default function Results() {
         dispatch(filterActions.setReset())
         setCurrentPage(1)
 
+    }
+
+    function openModal(vulnerability) {
+        setSelectedCVE(vulnerability)
+        setIsModalOpen(true)
+    }
+
+    function closeModal() {
+        setIsModalOpen(false)
+        setSelectedCVE(null)
     }
 
     useEffect(() => {
@@ -116,21 +131,27 @@ export default function Results() {
     }
 
     return (
-        <div>
-            <input 
-                onKeyDown={inputEnterPressed} 
-                value={searchedTerm} 
-                onChange={handleInputChange} 
-                type="text" 
-                placeholder='Enter a threat' />
+        <div className='results-container'>
+           <div className='search-section-container'>
+                <div className='search-field'>
+                    <input 
+                        onKeyDown={inputEnterPressed} 
+                        value={searchedTerm} 
+                        onChange={handleInputChange} 
+                        type="text" 
+                        placeholder='Enter a threat or CVE ID...' 
+                    />
+                </div>
+                
+                <button className='reset-btn' onClick={resetButtonPressed}>
+                    Reset
+                </button>
+            </div>
 
-            <button onClick={resetButtonPressed}>
-                Reset
-            </button>
-
-            <div>
+            <div className='vulnerabilities-section'>
                 <h2>Vulnerabilities ({filteredThreats.length})</h2>
-                <table>
+                <div className='table-wrapper'>
+                    <table className='vulnerabilities-table'>
                     <thead>
                         <tr>
                             <th>CVE ID</th>
@@ -145,17 +166,19 @@ export default function Results() {
 
                     <tbody>
                         {thisPageItem.map((threat, index) => (
-                            <tr key={index || threat.id}>
-                                <td>{threat.cveID || 'N/A'}</td>
+                            <tr key={index}>
+                                <td ><button className='cveID' title='View more info' onClick={() => openModal(threat)}>{threat.cveID || 'N/A'}</button></td>
                                 <td>{threat.vendorProject}</td>
                                 <td>{threat.vulnerabilityName} </td>
                                 <td>{threat.dateAdded} </td>
-                                <td>{threat.dueDate} </td>
-                                <td>{threat.knownRansomwareCampaignUse} </td>
+                                <td className='dueDate'>{threat.dueDate} </td>
+                                <td className='knownUnknown'>{threat.knownRansomwareCampaignUse} </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
+                </div>
+                
 
                 {totalPages > 1 && (
                     <nav className="pagination">
@@ -177,6 +200,12 @@ export default function Results() {
                     </nav>
                 )}
             </div>
+
+            <Modal
+            vulnerability={selectedCVE}
+            modalOpen={isModalOpen}
+            closeModal={closeModal}
+            />
         </div>
     )
 }

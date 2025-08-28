@@ -54,22 +54,29 @@ export default function FilteredSection() {
     const completeVendorList = ['All', ...nonDuplicateVendorNames] 
 
   return (
-    <div>
+    <div className='filter-section-container'>
         {/*Stores all options under a dropdown */}
         
-       <select value={selectedVendor} onChange={handleVendorOptionChange}>
+        <div className='filter-field'>
+            <select value={selectedVendor} onChange={handleVendorOptionChange}>
             {
                 completeVendorList.map(vendor => {
                     return <option value={vendor} key={vendor}>{vendor}</option>
                 })
             }
-       </select>
+            </select>
 
-        <select value={selectedRansomware} onChange={handleRansomwareOptions}>
-            <option value="All">All Ransomware</option>
-            <option value="Known">Ransomware Known</option>
-            <option value="Unknown">Ransomware Unknown</option>
-        </select>
+       </div>
+        
+        <div className='filter-field'>
+    
+            <select value={selectedRansomware} onChange={handleRansomwareOptions}>
+                <option value="All">All Ransomware</option>
+                <option value="Known">Ransomware Known</option>
+                <option value="Unknown">Ransomware Unknown</option>
+            </select>
+        </div>
+        
     </div>
   )
 }
