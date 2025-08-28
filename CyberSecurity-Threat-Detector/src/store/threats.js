@@ -1,6 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-import { mockThreats } from "../mockThreats";
 
 const initialThreatsState = {threats: [], loading: false, error: null}
 

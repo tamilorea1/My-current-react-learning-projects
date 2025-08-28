@@ -1,19 +1,26 @@
-import Logo from '../assets/WebsiteIcon.png'
+/**
+ * Header.jsx
+ * Main application header with title, live feed toggle, and data export functionality
+ * Handles user interactions for exporting filtered vulnerability data to CSV
+ */
+
 import React, { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faShieldVirus, faSpinner, faWaveSquare, faDownload } from '@fortawesome/free-solid-svg-icons';
-import { useSelector } from 'react-redux';
 import { exportToCSV } from '../utility/exportCSV';
 import { useFilteredThreats } from '../hooks/useFilteredThreats';
 
 export default function Header() {
+    // State for live feed activation visual feedback
   const [isLiveFeedActivated, setIsLiveFeedActivated] = useState(false)
 
+    // State for export process loading UI
   const [exportIsLoading, setExportIsLoading] = useState(false)
 
+    // Get currently filtered threats based on user selections
   const filteredThreats = useFilteredThreats()
 
-
+  // Toggle live feed state and provide user feedback
   function liveFeedToggle() {
     setIsLiveFeedActivated(!isLiveFeedActivated)
 
@@ -25,6 +32,13 @@ export default function Header() {
     }
   }
 
+  // Handle exporting filtered threats to CSV with loading state
+   /**
+   * - Validates data availability
+   * - Creates timestamped filename
+   * - Shows loading UI during export simulation
+   * - Triggers CSV download
+   */
   async function handleExport() {
     if (filteredThreats.length === 0) {
       alert('No data available to export')
@@ -38,6 +52,7 @@ export default function Header() {
 
     const filename = `vulnerabilities_${formattedDate}.csv`;
 
+    // Simulate a delay for the export process (e.g., fetching data, processing)
     await new Promise(resolve => setTimeout(resolve, 1500))
     //export the data 
     exportToCSV(filteredThreats, filename)
@@ -85,7 +100,7 @@ export default function Header() {
         className={`exportBtn ${exportIsLoading ? 'exporting' : ''}`} 
           title='Export vulnerability data' 
           onClick={handleExport}
-          disabled={exportIsLoading} // ← Disable button during export
+          disabled={exportIsLoading} // Disable button during export
         >
           {exportIsLoading ? (
             <>

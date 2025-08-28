@@ -2,8 +2,8 @@
 import { initializeApp } from "firebase/app";
 import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
 
-// Your web app's Firebase configuration
-// You'll get these values from Firebase Console > Project Settings > General tab
+//  web app's Firebase configuration
+
 const firebaseConfig = {
   apiKey: "AIzaSyDcWKObljLcgH9E5LauDBCtXekBVGbhrTU",
   authDomain: "cybersecurity-threat-detector.firebaseapp.com",
@@ -19,9 +19,5 @@ const app = initializeApp(firebaseConfig);
 
 // Initialize Functions
 export const functions = getFunctions(app);
-
-// If you're running locally, connect to the Functions emulator
-// Comment this out when deploying to production
-// connectFunctionsEmulator(functions, "localhost", 5001);
 
 export default app;

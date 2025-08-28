@@ -1,5 +1,7 @@
 import { useSelector } from "react-redux"
 
+//custom hook to filter threats based on search term, vendor and ransomware type
+
 export const useFilteredThreats = () =>{
 
     //Gathered all the threats from the mockThreats.js file
@@ -12,7 +14,7 @@ export const useFilteredThreats = () =>{
 
     const submittedTerm = useSelector(state => state.filter.submittedTerm)
 
-
+    //filter through the threats array and return only the threats that match the search term, vendor and ransomware type
     const filteredThreats = threats.filter((threat) => {
        
         // If no search term entered (submittedTerm is empty) -> show all information

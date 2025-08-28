@@ -1,3 +1,9 @@
+/**
+ * FilteredSection.jsx
+ * component that provides filtering options for cybersecurity threats based on vendor and ransomware status.
+ * It uses Redux to manage state and dispatch actions for filtering.
+ */
+
 
 import React from 'react'
 import {useDispatch, useSelector} from 'react-redux'
@@ -7,7 +13,7 @@ import { filterActions } from '../store/filter'
 
 
 export default function FilteredSection() {
-
+    //gets the initial state of all threats from the threats.js file
     const threats = useSelector(state => state.threats.threats)
     
 
@@ -22,7 +28,7 @@ export default function FilteredSection() {
 
     //handles the different options changes that a user makes
     function handleVendorOptionChange(event) {
-        event.preventDefault();
+        event.preventDefault(); //prevents the default action of the event from being triggered
 
         //gets the option selected by the user and stores it in the state 'selectedVendor'
         dispatch(filterActions.setSelectedVendor(event.target.value))
@@ -33,10 +39,6 @@ export default function FilteredSection() {
 
         //gets the option selected by the user and stores it in the state 'selectedRansomware'
         dispatch(filterActions.setSelectedRansomware(event.target.value))
-    }
-
-    function resetButtonPressed() {
-        dispatch(filterActions.setReset())
     }
 
     //gather all the vendorProjects into the variable
@@ -51,7 +53,7 @@ export default function FilteredSection() {
 
     // Convert the set back to an array
     //Have 'All' be the first value, and then spread the unique vendor project names
-    const completeVendorList = ['All', ...nonDuplicateVendorNames] 
+    const completeVendorList = ['All Vendors', ...nonDuplicateVendorNames] 
 
   return (
     <div className='filter-section-container'>

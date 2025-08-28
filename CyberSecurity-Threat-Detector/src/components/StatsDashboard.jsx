@@ -1,7 +1,17 @@
+/**
+ * StatsDashboard.jsx
+ * Known for displaying key statistics about cybersecurity threats.
+ * Fetches threat data from an external API and calculates:
+ * - Total vulnerabilities
+ * - Ransomware-related threats
+ * - Critical due dates within the next week
+ * Utilizes Redux for state management and custom hooks for filtering threats.
+ * Displays loading and error states appropriately.
+ * Incorporates FontAwesome icons for visual representation of stats.
+ */
 
 import React, { useEffect } from 'react'
 import {useSelector, useDispatch} from 'react-redux'
-import { calculateThreatStats } from '../mockThreats';
 import { threatActions } from '../store/threats';
 import { functions } from '../firebase';
 import { httpsCallable } from 'firebase/functions';
@@ -13,25 +23,26 @@ import Error from './Error';
 
 export default function StatsDashboard() {
 
-    
+    //loading and error states from the Redux store
     const loading = useSelector(state => state.threats.loading)
 
     const error = useSelector(state => state.threats.error)
 
+    //get the filtered threats from the custom hook
+    //this will give us the threats based on the current filters applied
     const filteredThreats = useFilteredThreats()
 
+    //dispatch function to dispatch actions to the Redux store
     const dispatch = useDispatch();
 
-    
-    
-      
       // Simulate fetching data from an API
+      //this function is async because we are using fetch
       const fetchData = async () => {
         //data is being loaded
         dispatch(threatActions.setThreatsAtStart())
         try {
             // throw new Error('Testing error handling!')
-
+          
           const response = await fetch('https://getcisathreats-nllkmt6r6a-uc.a.run.app')
 
           if (!response.ok) {
@@ -43,10 +54,7 @@ export default function StatsDashboard() {
           // Add a small delay to show the loading state
           await new Promise(resolve => setTimeout(resolve, 1000));
 
-          //vulnerabilities is stored in an array
-          //so we need to spread the array into the action payload
-          //also slice the number of vulnerabilities from 0 -10 i think when mapping over the filteredThreats
-          // dispatch(threatActions.setThreatsAtSuccess(data.vulnerabilities || []));
+          
 
           // Make sure we have data before dispatching success
           if (data && Array.isArray(data.vulnerabilities)) {
@@ -68,20 +76,17 @@ export default function StatsDashboard() {
       };
 
 
-    
+    // Fetch data on component mount
       useEffect(() => {
         fetchData()
       }, [dispatch])
 
 
     
-
+      // Calculate statistics based on filtered threats
     const totalVulnerabilities = filteredThreats.length;
 
     const ransomwareCount = filteredThreats.filter(threat => threat.knownRansomwareCampaignUse === 'Known').length
-
-    //apply this later
-    const unknownRansomwareCount = filteredThreats.filter(threat => threat.knownRansomwareCampaignUse === 'Unknown').length
 
     //gives today the date object, which stores the current day
     const today = new Date();
@@ -93,6 +98,8 @@ export default function StatsDashboard() {
     //If today is Monday, next week will be the following Monday
     nextWeek.setDate(today.getDate() + 7);
 
+    //filter through the threats to find those with due dates within the next week
+    //and return the length of that array
     const criticalDueDate = filteredThreats.filter(threat => {
       //sets the dueDate to the same one in our API 
       //property name dueDate
@@ -105,6 +112,7 @@ export default function StatsDashboard() {
     }).length;
 
 
+    // Render loading, error, or stats based on state
     if (loading) {
       return <LoadingScreen/>
     }

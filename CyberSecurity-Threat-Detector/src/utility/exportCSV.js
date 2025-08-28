@@ -1,5 +1,7 @@
 
 export const exportToCSV = (data, filename) => {
+    // Check if data is valid
+    //if data is null, undefined, or an empty array, return early
     if (!data || data.length === 0) {
         console.warn('No data available to export.');
         return;

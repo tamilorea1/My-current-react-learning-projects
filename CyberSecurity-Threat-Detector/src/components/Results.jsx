@@ -1,3 +1,13 @@
+/**
+ * Results.jsx
+ * This component displays the search results for cybersecurity threats.
+ * It includes a search bar, a reset button, and a table of vulnerabilities.
+ * The table supports pagination and allows users to view more details about each threat in a modal.
+ * It uses Redux for state management and custom hooks for filtering threats.
+ * Displays a table of vulnerabilities
+ * When a CVE ID is clicked, it opens a modal with more details
+ */
+
 
 import React, { useEffect, useState } from 'react'
 import {useDispatch, useSelector} from 'react-redux'
@@ -20,15 +30,19 @@ export default function Results() {
     //the default is 7
     const [itemsPerPage, setItemsPerPage] = useState(7)
 
+    //state to track if modal is open or closed
     const [isModalOpen, setIsModalOpen] = useState(false)
 
+    //state to track which CVE is selected for modal display
     const [selectedCVE, setSelectedCVE] = useState(null)
 
+    //updates the search term in the redux store as user types
     function handleInputChange(event) {
         dispatch(filterActions.setSearchTerm(event.target.value))
         console.log(searchedTerm)
     }
 
+    //when user presses enter, it sets the submitted term in the redux store
     function inputEnterPressed(event) {
         if (event.key === 'Enter') {
             event.preventDefault();
@@ -36,22 +50,26 @@ export default function Results() {
         }
     }
 
-    function resetButtonPressed(params) {
+    //when user clicks reset button, it clears the search and submitted terms in the redux store
+    function resetButtonPressed() {
         dispatch(filterActions.setReset())
         setCurrentPage(1)
 
     }
 
+    //opens the modal and sets the selected CVE
     function openModal(vulnerability) {
         setSelectedCVE(vulnerability)
         setIsModalOpen(true)
     }
 
+    //closes the modal and clears the selected CVE
     function closeModal() {
         setIsModalOpen(false)
         setSelectedCVE(null)
     }
 
+    //when the submitted term changes, it triggers an API call
     useEffect(() => {
         if (submittedTerm) {
             console.log(submittedTerm)
@@ -133,6 +151,7 @@ export default function Results() {
     return (
         <div className='results-container'>
            <div className='search-section-container'>
+            {/* Search bar and reset button */}
                 <div className='search-field'>
                     <input 
                         onKeyDown={inputEnterPressed} 
@@ -148,6 +167,7 @@ export default function Results() {
                 </button>
             </div>
 
+            {/* Vulnerabilities table */}
             <div className='vulnerabilities-section'>
                 <h2>Vulnerabilities ({filteredThreats.length})</h2>
                 <div className='table-wrapper'>
@@ -164,6 +184,7 @@ export default function Results() {
                         </tr>
                     </thead>
 
+                    {/* Display the current page's items */}
                     <tbody>
                         {thisPageItem.map((threat, index) => (
                             <tr key={index}>
@@ -179,7 +200,7 @@ export default function Results() {
                 </table>
                 </div>
                 
-
+                {/* Pagination controls */}
                 {totalPages > 1 && (
                     <nav className="pagination">
                         <button 
@@ -201,6 +222,7 @@ export default function Results() {
                 )}
             </div>
 
+            {/* Modal for detailed CVE info */}
             <Modal
             vulnerability={selectedCVE}
             modalOpen={isModalOpen}
@@ -209,7 +231,3 @@ export default function Results() {
         </div>
     )
 }
-
-
-//TO DO WHEN I GET BACK
-//3) After those then we can style :)
